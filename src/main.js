@@ -1,19 +1,16 @@
 import Vue from 'vue';
 
-import Styles from './components/styles.vue';
-import Source from './components/source.vue';
-import ModelControl from './components/model_control.vue';
+import ModelControl from './components/model/control.vue';
+import ImageControl from './components/image/control.vue';
 
-import imageSource from './data/stored_source.js';
-import imageStyle from './data/stored_style.js';
-import imageLinks from './data/links.js';
-// get names from paths
-const linkNames = imageLinks.map(e => {
-    return e.match(/\/([^\/\.]+)\.jpg/)[1].replace(/\-/g, ' ');
-})
+import DataTypes from './data/types.js';
 
 import AppData from './data/app.js';
-import { Dnn } from './dnn/dnn.js';
+import Dnn from './dnn/dnn.js';
+
+Vue.filter("formatInteger", (val) => {
+    return Math.round(val);
+});
 
 Vue.config.productionTip = false;
 
@@ -21,34 +18,24 @@ new Vue({
     name: 'app',
 
     components: {
-        Styles,
-        Source,
+        ImageControl,
         ModelControl
     },
 
     data() {
         return Object.assign({
             check: true,
-            imageLinks: imageLinks,
-            styles: {
-                stored: {
-                    items: imageStyle,
-                    names: imageStyle
-                },
-                random: {
-                    items: imageLinks,
-                    names: linkNames
-                }
-            }
+            stylingIsReady: true
         }, AppData);
     },
+
 
     computed: {
         /**
          * add listeners
          * @returns {Object}
          */
-        inputListeners: function () {
+        inputListeners() {
             var vm = this
             // `Object.assign` merges objects together to form a new object
             return Object.assign(
@@ -64,14 +51,74 @@ new Vue({
                     }
                 }
             );
+        },
+        /**
+         * column divider
+         */
+        columnsStyle() {
+            return {
+                'col-md-3': true,
+                'col-xl-2': true,
+            };
+//            return Math.floor(12 / (this.style.values.length + 1));
+        },
+        columnsSource() {
+            return Object.assign({
+                'bg-light': true
+            }, this.columnsStyle);
+        },
+
+        stylingReady() {
+            return {
+                btn: true,
+                'btn-block': true,
+                'btn-primary': this.stylingIsReady,
+                'btn-secondary': !this.stylingIsReady,
+            }
         }
     },
 
     methods: {
-        changeStyle() {
+        changeStyleImage(values, styleNr) {
+            this.style.values[styleNr].setData(values);
+//            this.$nextTick().then(() => {
+//                console.log(values)
+//                this.$forceUpdate();
+//            });
+        },
+
+        changeSourceImage(values) {
+            this.source.values.setData(values);
+//            this.$nextTick().then(() => {
+//                console.log(values)
+//                this.$forceUpdate();
+//            });
+        },
+
+        removeStyleImage(styleNr) {
+            this.style.values.splice(styleNr, 1);
+        },
+
+        addStyleImage() {
+            this.style.values.push(DataTypes.ImageData);
+        },
+
+        updateSourceImages(newImages) {
+            let src = this.source.options.images[this.source.values.source];
+            src.items = src.items.concat(newImages.items);
+            src.names = src.names.concat(newImages.names);
+        },
+        updateStyleImages(newImages, styleNr) {
+            let src = this.style.options.images[this.style.values[styleNr].source];
+            src.items = src.items.concat(newImages.items);
+            src.names = src.names.concat(newImages.names);
 
         },
-        changeTransformer() {
+
+        changeStyleModel(modelName) {
+
+        },
+        changeTransformerModel(modelName) {
 
         }
     },

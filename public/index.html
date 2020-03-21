@@ -13,25 +13,106 @@
         <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet">
     </head>
     <body>
-        <div id="app">
+        <!-- As a heading -->
+        <div class="jumbotron jumbotron-fluid">
+            <div class="container">
+                <h1 class="display-4">Arbitrary Style Transfer</h1>
+                <p class="lead"> in Browser</p>
+            </div>
+        </div>
+        <div id="app" class="container-fluid">
             <div v-if="!check" class="alert alert-warning" role="alert">
                 This site may have problems functioning on mobile devices.
                 Don't worry, you can still read the description below!
             </div>
             <div class="row">
-                <component class="col" is="Source" :images="images" :data="source"></component>
-                <component class="col" is="Styles"
-                           v-for="(s, k) in style"
-                           :key="k"
-                           :images="styles"
-                           :data="style[k]"></component>
+                <image-control :class="columnsSource"
+                               :options="source.options"
+                               :value="source.values"
+                               title="Source Image"
+                               size-min="32"
+                               size-max="800"
+                               :is-last="false"
+                               :removable="false"
+                               ref="MySource"
+                               @change="changeSourceImage"
+                               @update-items="updateSourceImages">
+                    <div v-show="source.values.image">
+                        <div class="input-group">
+                            <input
+                                type="range"
+                                min="0"
+                                max="100"
+                                :value="source.values.ratio*100.0"
+                                data-toggle="tooltip"
+                                data-placement="top"
+                                data-original-title="Stylization Ratio"
+                                class="custom-range"
+                                @input="source.values.ratio = $event.target.value/100.0"
+                                @change="source.values.ratio = $event.target.value/100.0">
+                            <div class="input-group-append">
+                                <span class="number">{{ source.values.ratio * 100 | formatInteger }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </image-control>
+                <image-control :class="columnsStyle"
+                               v-for="(s, k) in style.values"
+                               :key="k"
+                               :title="'Style Image #' + k"
+                               size-min="32"
+                               size-max="800"
+                               :options="style.options"
+                               :value="s"
+                               :is-last="k == style.values.length-1"
+                               :removable="style.values.length > 1"
+                               ref="MyStyle"
+                               @change="changeStyleImage($event, k)"
+                               @update-items="updateStyleImages($event, k)"
+                               @remove="removeStyleImage(k)"
+                               @add="addStyleImage()">
+                    <div v-show="s.image">
+                        <div class="input-group">
+                            <input
+                                type="range"
+                                min="0"
+                                max="100"
+                                :value="s.ratio*100.0"
+                                data-toggle="tooltip"
+                                data-placement="top"
+                                data-original-title="Stylization Strength"
+                                class="custom-range"
+                                @input="s.ratio = $event.target.value/100.0"
+                                @change="s.ratio = $event.target.value/100.0">
+                            <div class="input-group-append">
+                                <span class="form-control number">{{ s.ratio * 100 | formatInteger }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </image-control>
             </div>
             <div class="row">
-                <component class="col" is="ModelControl" title="Style model" @change="changeStyle($event)" :models="models.style" :model="model.style" :disabled="false"></component>
-                <component class="col" is="ModelControl" title="Transformer model" @change="changeTransformer($event)" :models="models.transformer" :model="model.transformer" :disabled="false"></component>
+                <model-control class="col-4"
+                           title="Style model"
+                           @change="changeStyleModel($event)"
+                           :models="models.style"
+                           :model="model.style"
+                           :disabled="false"></model-control>
+                <model-control class="col-4"
+                           title="Transformer model"
+                           @change="changeTransformerModel($event)"
+                           :models="models.transformer"
+                           :model="model.transformer"
+                           :disabled="false"></model-control>
+
             </div>
             <div class="row">
-                <div class="col">result</div>
+                <div class="col-12">
+                    <button :class="stylingReady">Start Styling</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">result</div>
             </div>
         </div>
 

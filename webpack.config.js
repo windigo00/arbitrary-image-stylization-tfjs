@@ -7,9 +7,11 @@ const CopyPlugin = require('copy-webpack-plugin');
 let isDevelopment = process.env.NODE_ENV === 'production' ? false : true;
 module.exports = {
     mode: !isDevelopment ? 'production' : 'development',
-    entry: [
-        __dirname + '/src/main.js'
-    ],
+    devtool: 'inline-source-map',
+    entry: {
+        main: __dirname + '/src/main.js',
+        worker: __dirname + '/src/worker.js'
+    },
     output: {
         path: path.resolve(__dirname, 'dist')
     },
@@ -19,8 +21,8 @@ module.exports = {
             template: __dirname + '/public/index.html'
         }),
         new CopyPlugin([
-            { from: __dirname + '/saved_models', to: __dirname + '/dist/saved_models' },
-            { from: __dirname + '/images', to: __dirname + '/dist/images' }
+            {from: __dirname + '/saved_models', to: __dirname + '/dist/saved_models'},
+            {from: __dirname + '/images', to: __dirname + '/dist/images'}
         ])
     ],
 
@@ -40,6 +42,11 @@ module.exports = {
                     'vue-style-loader',
                     'css-loader'
                 ]
+            },
+            {
+                test: /\.tsx?$/,
+                use: 'ts-loader',
+                exclude: /node_modules/,
             }
         ]
     },
@@ -47,6 +54,6 @@ module.exports = {
         alias: {
             'vue$': 'vue/dist/vue.esm.js'
         },
-        extensions: ['.js', '.jsx']
+        extensions: [ '.tsx', '.ts', '.js', '.jsx']
     }
 };
