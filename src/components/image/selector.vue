@@ -1,15 +1,18 @@
 <template>
-    <div class="container bg-white">
-        <div class="card-columns">
-            <lazy-image
-                :class="'card img-cnt'+ (selected == k ? ' selected' : '')"
-                v-for="(i, k) in options.items"
-                :key="k"
-                :src="getImage(k)"
-                :title="getName(k)"
-                @click="setSelected(k, $event)"></lazy-image>
-            <slot name="add"></slot>
+    <div class="container bg-white selector">
+        <div class="card-container">
+            <div class="card-columns">
+                <lazy-image
+                    :class="imageClass(k)"
+                    v-for="(i, k) in options.items"
+                    :key="k"
+                    :src="getImage(k)"
+                    :title="getName(k)"
+                    @click="setSelected(k, $event)"></lazy-image>
+                <slot name="add"></slot>
+            </div>
         </div>
+        <slot name="after"></slot>
     </div>
 </template>
 
@@ -26,7 +29,16 @@
             return {
             }
         },
+        computed: {
+        },
         methods: {
+            imageClass(key) {
+                return {
+                    card: true,
+                    'img-cnt': true,
+                    selected: this.selected == key
+                };
+            },
             getImage(idx) {
                 return this.options.items[idx];
             },
@@ -50,19 +62,22 @@
     .img-cnt {
         border: 0px;
         border-radius: 0;
-        margin-bottom: 0.1rem;
+        margin-bottom: 0.1em;
 
     }
 
     .card-columns {
-        column-gap: 0.1rem;
-        -webkit-column-gap: 0.1rem;
+        column-gap: 1px;
+        -webkit-column-gap: 0.1em;
         column-count: 6;
     }
     .container {
-        height: 10em;
+        margin: 0.1em 0;
+    }
+    .card-container {
+        min-height: 1em;
+        max-height: 10em;
         overflow: auto;
-        margin: 0.1rem 0;
     }
     .img-cnt.selected {
         border: 1px solid red;

@@ -26,40 +26,33 @@
                 Don't worry, you can still read the description below!
             </div>
             <div class="row">
-                <image-control :class="columnsSource"
+                <!-- image-control :class="columnsSource"
                                :options="source.options"
-                               :value="source.values"
+                               :value="source.values[0]"
                                title="Source Image"
+                               hint="A bigger content image results in a more detailed output, but increases the processing time significantly."
                                size-min="32"
                                size-max="800"
                                :is-last="false"
                                :removable="false"
                                ref="MySource"
-                               @change="changeSourceImage"
-                               @update-items="updateSourceImages">
-                    <div v-show="source.values.image">
-                        <div class="input-group">
-                            <input
-                                type="range"
-                                min="0"
-                                max="100"
-                                :value="source.values.ratio*100.0"
-                                data-toggle="tooltip"
-                                data-placement="top"
-                                data-original-title="Stylization Ratio"
-                                class="custom-range"
-                                @input="source.values.ratio = $event.target.value/100.0"
-                                @change="source.values.ratio = $event.target.value/100.0">
-                            <div class="input-group-append">
-                                <span class="number">{{ source.values.ratio * 100 | formatInteger }}</span>
-                            </div>
-                        </div>
-                    </div>
+                               @change="changeImage('source', $event)"
+                               @update-items="updateImages('source', $event)">
+                    <image-attributes
+                            class="control item"
+                            v-show="source.values.image"
+                            title="Stylization Ratio"
+                            hint="This parameter affects the stylization strength. The further to the right, the stronger the stylization. This is done via interpolation between the style vectors of the content and style images."
+                            :size-min="0"
+                            :size-max="100"
+                            :size="source.values.ratio * 100"
+                            @change="source.values.ratio = $event/100.0"></image-attributes>
                 </image-control>
                 <image-control :class="columnsStyle"
                                v-for="(s, k) in style.values"
                                :key="k"
                                :title="'Style Image #' + k"
+                               hint="Changing the size of a style image usually affects the texture"
                                size-min="32"
                                size-max="800"
                                :options="style.options"
@@ -67,54 +60,54 @@
                                :is-last="k == style.values.length-1"
                                :removable="style.values.length > 1"
                                ref="MyStyle"
-                               @change="changeStyleImage($event, k)"
-                               @update-items="updateStyleImages($event, k)"
-                               @remove="removeStyleImage(k)"
-                               @add="addStyleImage()">
-                    <div v-show="s.image">
-                        <div class="input-group">
-                            <input
-                                type="range"
-                                min="0"
-                                max="100"
-                                :value="s.ratio*100.0"
-                                data-toggle="tooltip"
-                                data-placement="top"
-                                data-original-title="Stylization Strength"
-                                class="custom-range"
-                                @input="s.ratio = $event.target.value/100.0"
-                                @change="s.ratio = $event.target.value/100.0">
-                            <div class="input-group-append">
-                                <span class="form-control number">{{ s.ratio * 100 | formatInteger }}</span>
-                            </div>
-                        </div>
-                    </div>
-                </image-control>
+                               @change="changeImage('style', $event, k)"
+                               @update-items="updateImages('style', $event, k)"
+                               @remove="removeImage(k)"
+                               @add="addImage()">
+                    <image-attributes
+                            class="control item"
+                            v-show="s.image"
+                            title="Stylization Strength"
+                            hint="This parameter affects the strength of the two styles relative to each other. This is done via interpolation between the style vectors of the two style images."
+                            :size-min="0"
+                            :size-max="100"
+                            :size="s.ratio * 100"
+                            @change="s.ratio = $event/100.0"></image-attributes>
+                </image-control -->
             </div>
             <div class="row">
-                <model-control class="col-4"
+                <!-- model-control class="col-4"
                            title="Style model"
-                           @change="changeStyleModel($event)"
+                           @change="changeModel('style', $event)"
                            :models="models.style"
                            :model="model.style"
                            :disabled="false"></model-control>
                 <model-control class="col-4"
                            title="Transformer model"
-                           @change="changeTransformerModel($event)"
+                           @change="changeModel('transformer', $event)"
                            :models="models.transformer"
                            :model="model.transformer"
-                           :disabled="false"></model-control>
+                           :disabled="false"></model-control -->
 
             </div>
             <div class="row">
                 <div class="col-12">
-                    <button :class="stylingReady">Start Styling</button>
+                    <button :class="stylingReady"
+                            :disabled="!stylingIsReady"
+                            @click="doStyling"
+                            v-html="stateMessage"></button>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-12">result</div>
+            <div class="row" v-if="resultData">
+                <!-- result-control class="col-12"
+                                ref="output"
+                                :options="resultOptions"
+                                @change="updateResultData($event)"
+                                @message="setMessage"></result-control -->
             </div>
+            <!--<info-overlay ref="info" id="info" :messages="messages"></info-overlay>-->
         </div>
+
 
         <!-- JQuery -->
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -123,10 +116,5 @@
         <!-- Bootstrap core JavaScript -->
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js"></script>
 
-        <script type="text/javascript">
-            $(function () {
-                $('[data-toggle="tooltip"]').tooltip()
-            })
-        </script>
     </body>
 </html>

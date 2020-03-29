@@ -1,22 +1,6 @@
 export default {
     get ImageData() {
-        return {
-            size: 420,
-            smooth: true,
-            square: false,
-            source: 'stored',
-            image: null,
-            imageIdx: null, //selection index
-            ratio: 0.5,
-            setData(value) {
-                if (value.size     !== undefined) this.size     = value.size;
-                if (value.smooth   !== undefined) this.smooth   = value.smooth;
-                if (value.square   !== undefined) this.square   = value.square;
-                if (value.source   !== undefined) this.source   = value.source;
-                if (value.image    !== undefined) this.image    = value.image;
-                if (value.imageIdx !== undefined) this.imageIdx = value.imageIdx;
-            }
-        };
+        return new ImageData;
     },
 
     get ImageSourceData() {
@@ -24,5 +8,33 @@ export default {
             items: [],
             names: []
         };
+    }
+}
+
+class ImageData {
+    constructor() {
+        this.size     = 42;
+        this.smooth   = false;
+        this.square   = false;
+        this.source   = 'stored';
+        this.image    = null;
+        this.resampled= null;//resampled image
+        this.imageIdx = null; //selection index
+        this.ratio    = 0.5;
+    }
+
+    setData(value) {
+        for(var i in value) {
+            this[i] = value[i];
+        }
+    }
+    getData(exclude) {
+        console.log(arguments);
+        let ret = {};
+        for(var i in this) {
+            if (exclude && exclude.includes(i)) continue;
+            ret[i] = this[i];
+        }
+        return ret;
     }
 }

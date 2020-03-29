@@ -1,9 +1,9 @@
-import imageSource from './stored/source.js';
-import imageStyle  from './stored/style.js';
-
-import imageLinks from './links.js';
+//import imageStored from './stored/style.js';
+const imageStored = [];
+//import imageRandom from './random/links.js';
+const imageRandom = [];
 // get names from paths
-const linkNames = imageLinks.map(e => {
+const imageNamesRandom = imageRandom.map(e => {
     return e.match(/\/([^\/\.]+)\.jpg/)[1].replace(/\-/g, ' ');
 })
 
@@ -18,34 +18,46 @@ export default {
         transformer: 'separable'
     },
     models : {
-        style: [{
-            name:'mobilenet',
-            title: '[Fast] Distilled MobileNet style model (9.6MB)'
-        },{
-            name:'inception',
-            title: '[High quality] Original Inceptionv3 style model (36.3MB)'
-        }],
-        transformer:[{
-            name: 'separable',
-            title: '[Fast] Separable_conv2d transformer (2.4MB)'
-        },{
-            name: 'original',
-            title: '[High quality] Original transformer model (7.9MB)'
-        }]
+        style: {
+            mobilenet: {
+                name : 'style_mobilenet',
+                model: 'saved_models/style_js/model.json',
+                title: '[Fast] Distilled MobileNet style model (9.6MB)'
+            },
+            inception: {
+                name : 'style_inception',
+                model: 'saved_models/style_inception_js/model.json',
+                title: '[High quality] Original Inceptionv3 style model (36.3MB)'
+            }
+        },
+        transformer: {
+            separable: {
+                name : 'transformer_separable',
+                model: 'saved_models/transformer_separable_js/model.json',
+                title: '[Fast] Separable_conv2d transformer (2.4MB)'
+            },
+            original: {
+                name : 'transformer_original',
+                model: 'saved_models/transformer_js/model.json',
+                title: '[High quality] Original transformer model (7.9MB)'
+            }
+        }
     },
 
     source: {
-        values: Types.ImageData,
+        values: [
+            Types.ImageData
+        ],
 
         options: {
             images: {
                 stored: Object.assign(Types.ImageSourceData, {
-                    items: imageSource,
-                    names: imageSource
+                    items: imageStored,
+                    names: imageStored
                 }),
                 random: Object.assign(Types.ImageSourceData, {
-                    itemsSrc: imageLinks,
-                    namesSrc: linkNames
+                    itemsSrc: imageRandom,
+                    namesSrc: imageNamesRandom
                 }),
                 file: Types.ImageSourceData,
                 camera: Types.ImageSourceData
@@ -55,19 +67,18 @@ export default {
 
     style: {
         values: [
-            Types.ImageData,
             Types.ImageData
         ],
 
         options: {
             images: {
                 stored: Object.assign(Types.ImageSourceData, {
-                    items: imageStyle,
-                    names: imageStyle
+                    items: imageStored,
+                    names: imageStored
                 }),
                 random: Object.assign(Types.ImageSourceData, {
-                    itemsSrc: imageLinks,
-                    namesSrc: linkNames
+                    itemsSrc: imageRandom,
+                    namesSrc: imageNamesRandom
                 }),
                 file: Types.ImageSourceData,
                 camera: Types.ImageSourceData

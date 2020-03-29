@@ -10,7 +10,8 @@ module.exports = {
     devtool: 'inline-source-map',
     entry: {
         main: __dirname + '/src/main.js',
-        worker: __dirname + '/src/worker.js'
+        data_worker: __dirname + '/src/data/worker.js',
+        dnn_worker: __dirname + '/src/dnn/worker.js'
     },
     output: {
         path: path.resolve(__dirname, 'dist')
@@ -55,5 +56,8 @@ module.exports = {
             'vue$': 'vue/dist/vue.esm.js'
         },
         extensions: [ '.tsx', '.ts', '.js', '.jsx']
+    },
+    node: {
+       fs: "empty"
     }
 };

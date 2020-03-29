@@ -25,13 +25,20 @@
         methods: {
             async loadImage(url) {
                 var image = this.$refs['imgEl'];
-                return new Promise( (resolve, reject) => {
-//                    var image = new Image()
-                    image.src = url
-//                    image.crossOrigin = "Anonymous";
+                return new Promise((resolve, reject) => {
+                    if (typeof url != 'string') {// source is file
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            image.src = e.target.result;
+                        };
+                        reader.readAsDataURL(url);
+                    } else {
+                        image.src = url;
+//                        image.crossOrigin = "Anonymous";
+                    }
                     image.onload = () => resolve(image)
                     image.onerror = () => reject(new Error('could not load image'))
-                })
+                });
             },
 
             updateImage() {

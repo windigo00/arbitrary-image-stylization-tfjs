@@ -1,13 +1,13 @@
 <template>
     <parent :options="options" :selected="selected" @change="$emit('change', $event)">
-        <template v-slot:add>
-            <div class="card img-cnt">
-                <button class="btn btn-primary"
+        <template v-slot:after>
+                <button class="btn btn-block btn-primary"
                         @click="addImages(5)"
-                        title="Add new random image">
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        data-original-title="Add new random image">
                     <i class="fas fa-random"></i>
                 </button>
-            </div>
         </template>
     </parent>
 </template>
@@ -66,10 +66,19 @@
             }
         },
         created() {
-            this.addImages(6);
+            if (this.options.items.length == 0) {
+                this.addImages(6);
+            }
         }
     }
 </script>
+
+<style >
+    .selector {
+       padding-left: 0;
+       padding-right: 0;
+    }
+</style>
 
 
 
