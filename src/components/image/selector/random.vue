@@ -1,29 +1,40 @@
 <template>
-    <parent :options="options" :selected="selected" @change="$emit('change', $event)">
-        <template v-slot:after>
-                <button class="btn btn-block btn-primary"
-                        @click="addImages(5)"
-                        data-toggle="tooltip"
-                        data-placement="top"
-                        data-original-title="Add new random image">
-                    <i class="fas fa-random"></i>
-                </button>
-        </template>
-    </parent>
+  <parent
+    :options="options"
+    :selected="selected"
+    @change="$emit('change', $event)"
+  >
+    <template v-slot:after>
+      <button
+        class="btn btn-block btn-primary"
+        data-toggle="tooltip"
+        data-placement="top"
+        data-original-title="Add new random image"
+        @click="addImages(5)"
+      >
+        <i class="fas fa-random" />
+      </button>
+    </template>
+  </parent>
 </template>
 
 <script>
     import Selector from '../selector.vue';
 
     export default {
-        extends: Selector,
-        name: 'random_image_select',
+        name: 'RandomImageSelect',
         components: {
             parent: Selector
         },
+        extends: Selector,
         data() {
 
             return {
+            }
+        },
+        created() {
+            if (this.options.items.length == 0) {
+                this.addImages(6);
             }
         },
         methods: {
@@ -64,12 +75,8 @@
                     item: unselectedItems[idx],
                 };
             }
-        },
-        created() {
-            if (this.options.items.length == 0) {
-                this.addImages(6);
-            }
         }
+
     }
 </script>
 

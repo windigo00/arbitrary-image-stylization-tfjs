@@ -1,7 +1,9 @@
-//import imageStored from './stored/style.js';
-const imageStored = [];
-//import imageRandom from './random/links.js';
-const imageRandom = [];
+/*eslint no-useless-escape: "off"*/
+
+import imageStored from './stored/style.js';
+//const imageStored = [];
+import imageRandom from './random/links.js';
+//const imageRandom = [];
 // get names from paths
 const imageNamesRandom = imageRandom.map(e => {
     return e.match(/\/([^\/\.]+)\.jpg/)[1].replace(/\-/g, ' ');

@@ -16,13 +16,8 @@ export default class Dnn {
         if (tf) {
             this.tf = tf;
         }
-//        console.log(arguments);
         this.models = {
         };
-//        this.model = eventHandler.model;
-//        this.eventHandler = eventHandler;
-//        this.offscreenWorker =
-//        this.eventHandler.$emit('done', 1);
     }
 
     updateData(options) {
@@ -38,45 +33,8 @@ export default class Dnn {
 
     async loadModel(type, modelData) {
 
-        postMessage('loading '+ modelData.model);
-        return await this.tf.loadGraphModel(modelData.model);
-    }
-
-    get Worker() {
-        if (!this._worker) {
-            this._worker = new Worker('dnn_worker.js');
-            this._worker.onmessage = this.catchMessage.bind(this);
-//            this._worker.postMessage = e => {};
-        }
-        return this._worker;
-    }
-
-    catchMessage(messageEvent) {
-//        console.log(this);
-//        console.log(messageEvent);
-        if (this.eventManager) {
-            this.eventManager.$emit('message', messageEvent.data);
-        }
-    }
-
-    async predict(outputCanvas) {
-        var data = this.opts;
-        var transfer = null;
-
-        if (!this.output) {
-            this.output = outputCanvas.transferControlToOffscreen();
-            data.canvas = this.output;
-            transfer = [this.output];
-        } else {
-            data.canvas = null;
-        }
-//        console.log(data);
-//        console.log(transfer);
-        this.Worker.postMessage(data, transfer);
-    }
-
-    createContext(canvas) {
-        this.ctx = canvas.getContext('2d');
+        postMessage(' - '+ modelData.title);
+        return await this.tf.loadGraphModel('../'+modelData.model);
     }
 
     async _loadModels() {
@@ -88,56 +46,53 @@ export default class Dnn {
         }
     }
 //
-    async backgroudPredict(outputCanvas) {
+    async predict(canvas) {
+        this.canvas = canvas;
         postMessage('Loading Models...');
         await this._loadModels();
-        console.log(this.tf.memory());
+//        console.log(this.tf.memory());
 
-        if (outputCanvas) {
-            this.createContext(outputCanvas);
-        }
-        if (this.ctx) {
+        if (this.canvas) {
 
             var styles = this.opts.styleData;
             var source = this.opts.sourceData[0];
             var styleNet = this.models[this.opts.styleModel.name];
             var transformerNet = this.models[this.opts.transformerModel.name];
             // unit of overall ratios (1%)
-            var ratioUnit = styles.reduce((accumulator, currentValue) => {
-                if (accumulator.ratio) {
-                    return currentValue.ratio;
-                } else {
-                    return accumulator + (currentValue.ratio);
-                }
-            });
+            var ratioUnit = 0.0;
+            for (let i = 0, max = styles.length; i < max; i++) {
+                ratioUnit += styles[i].ratio;
+            }
 
-            var bottlenecks = [],
-                combinedBottleneck = null,
+            var bottleneck,
+                scaled,
+                combinedBottleneck,
                 styled;
 
-            // await this.tf.nextFrame();
-            postMessage('Stylizing image...');
-            for(var i = 0, max = styles.length; i < max; i++) {
-                postMessage(`Generating 100D style representation of image #${i}`);
-                // await this.tf.nextFrame();
+            await this.tf.nextFrame();
 
-                bottlenecks[i] = await this.tf.tidy(() => {
+            for(let i = 0, max = styles.length; i < max; i++) {
+                postMessage(`Generating 100D style representation of image #${i}`);
+                await this.tf.nextFrame();
+
+                bottleneck = await this.tf.tidy(() => {
                     return styleNet.predict(this.tf.browser.fromPixels(styles[i].resampled).toFloat().div(this.tf.scalar(255)).expandDims());
                 });
-            }
-            /**
-            * @param {combined bottleneck} accumulator
-            */
-            combinedBottleneck = bottlenecks.reduce((accumulator, bottleneck, idx) => {
-                console.log(ratioUnit);
-                console.log(styles[idx].ratio * ratioUnit);
-                var scaled = bottleneck.mul(this.tf.scalar(styles[idx].ratio * ratioUnit));
-                if (accumulator.addStrict) {
-                    postMessage('Adding styles...');
-                    return accumulator.addStrict(scaled);
+
+                postMessage('Adding styles...');
+                var r = styles[i].ratio / ratioUnit
+//                console.log(r);
+
+                scaled = bottleneck.mul(this.tf.scalar(r));
+                if (combinedBottleneck) {
+                    combinedBottleneck.addStrict(scaled);
+                } else {
+                    combinedBottleneck = scaled;
                 }
-                return scaled;
-            });
+//                scaled.dispose();
+            }
+
+            postMessage('Stylizing image...');
             styled = await this.tf.tidy(() => {
                 return transformerNet.predict([
                     this.tf.browser.fromPixels(source.resampled).toFloat().div(this.tf.scalar(255)).expandDims(),
@@ -145,16 +100,14 @@ export default class Dnn {
                 ]).squeeze();
             });
 
-            await this.tf.browser.toPixels(styled, outputCanvas);
+            await this.tf.browser.toPixels(styled, this.canvas);
 
             // Might wanna keep this around
-            combinedBottleneck.dispose();
-            for(var i = 0, max = bottlenecks.length; i < max; i++) {
-                bottlenecks[i].dispose();
-            }
-            styled.dispose();
-            console.log(this.tf.memory().numTensors);
-            postMessage('done');
+//            combinedBottleneck.dispose();
+//            styled.dispose();
+//            console.log(this.tf.memory().numTensors);
+            let rendered = this.canvas.getContext('2d').getImageData(0, 0, this.canvas.width, this.canvas.height);
+            postMessage({event: 'change', image: rendered});
         }
     }
 }

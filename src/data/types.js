@@ -29,7 +29,7 @@ class ImageData {
         }
     }
     getData(exclude) {
-        console.log(arguments);
+//        console.log(arguments);
         let ret = {};
         for(var i in this) {
             if (exclude && exclude.includes(i)) continue;
