@@ -324,7 +324,6 @@
             },
 
             setMessage(message) {
-                console.log(message)
                 switch (message) {
                     case 'start':
                         this.$refs.info.show();

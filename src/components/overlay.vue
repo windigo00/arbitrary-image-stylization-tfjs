@@ -51,7 +51,9 @@
 
         mounted() {
             this.modal = $('#' + this.id).modal({//eslint-disable-line
-                show: false
+                show: false,
+                keyboard: false,
+                backdrop: 'static'
             });
             this.modal
             .on('hidden.bs.modal', function () {
@@ -92,6 +94,7 @@
                 }
             },
             showError() {
+                console.log('error')
                 this.hide();
                 this.modal.modal({
                     keyboard: true,

@@ -49,28 +49,34 @@
 
         methods: {
             handleMessage(e) {
+                var canvas = this.$refs['out'];
+                if (e.data == 'done') {
+                    this.offscreenWorker.terminate();
+                    this.offscreenWorker = WorkerFactory.getWorker('dnn', this.handleMessage, this.errorMessage);
+                    this.offscreenWorker.post('init');
+                    this.$emit('message', e.data);
+                } else if (!e.data.event) {
+                    this.$emit('message', e.data);
+                } else {
+                    switch (e.data.event) {
+                        case 'change':
+                            this.$emit('change', e.data.image);
+                            canvas.width = e.data.image.width;
+                            canvas.height = e.data.image.height;
+                            canvas.getContext('2d').putImageData(e.data.image, 0, 0);
+                            break;
+                        case 'initialized':
+                            this.$emit('init');
+                            break;
 
-                switch (e.data.event) {
-                    case 'change':
-                        this.$emit('change', e.data.image);
-                        var canvas = this.$refs['out'];
-                        this.offscreenWorker.terminate();
-                        this.offscreenWorker = WorkerFactory.getWorker('dnn', this.handleMessage, this.errorMessage);
-                        this.offscreenWorker.post('init');
-                        canvas.width = e.data.image.width;
-                        canvas.height = e.data.image.height;
-                        canvas.getContext('2d').putImageData(e.data.image, 0, 0);
+                        case 'error':
+                            this.$emit('error', e.data);
                         break;
-                    case 'initialized':
-                        this.$emit('init');
+                        default:
+                            console.log('def');
+                            console.log(e);
                         break;
-
-                    case 'error':
-                        this.$emit('error', e.data);
-                    break;
-                    default:
-                        this.$emit('message', e.data);
-                    break;
+                    }
                 }
             },
 

@@ -105,7 +105,7 @@ export default class Dnn {
             // Might wanna keep this around
 //            combinedBottleneck.dispose();
 //            styled.dispose();
-//            console.log(this.tf.memory().numTensors);
+
             let rendered = this.canvas.getContext('2d').getImageData(0, 0, this.canvas.width, this.canvas.height);
             postMessage({event: 'change', image: rendered});
         }
