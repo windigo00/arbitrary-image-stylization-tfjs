@@ -77,6 +77,26 @@
           :size="s.ratio * 100"
           @change="s.ratio = $event/100.0"
         />
+        <template #buttons>
+          <button
+            v-if="k > 0"
+            title="Move Left"
+            type="button"
+            class="btn btn-sm btn-info"
+            @click="moveStyleImage(k, -1)"
+          >
+            <i class="fas fa-less-than" />
+          </button>
+          <button
+            v-if="k < style.values.length-1"
+            title="Move Right"
+            type="button"
+            class="btn btn-sm btn-info"
+            @click="moveStyleImage(k, 1)"
+          >
+            <i class="fas fa-greater-than" />
+          </button>
+        </template>
       </image-control>
     </div>
     <div class="row bg-light">
@@ -118,7 +138,10 @@
     <result-gallery
       v-show="galleryItems.length"
       :items="galleryItems"
-      @remove-item="removeResultItem($event)"
+      @remove="removeResultItem($event)"
+      @remove-all="removeAllResultItems"
+      @save="saveResultItem($event)"
+      @save-all="saveAllResultItems"
     >
       <result-control
         v-show="1 || resultData"
@@ -134,11 +157,37 @@
         @error="showError('result', $event)"
       />
     </result-gallery>
+
     <info-overlay
       id="info"
       ref="info"
-      :messages="messages"
-    />
+    >
+      <template #header>
+        <h5
+          id="infoModalLabel"
+          class="modal-title"
+        >
+          {{ hasError ? 'Error' : 'Please wait' }}
+        </h5>
+      </template>
+      <template #content>
+        <ul class="list-group">
+          <li
+            v-for="(message, k) in messages"
+            :key="k"
+            :class="messageClass(message.type)"
+          >
+            <span
+              v-if="k == (messages.length-1) && message.type != 'error'"
+              class="float-right"
+            >
+              <i class="fas fa-cog fa-spin" />
+            </span>
+            {{ message.content }}
+          </li>
+        </ul>
+      </template>
+    </info-overlay>
   </div>
 </template>
 
@@ -237,6 +286,14 @@
                 }
                 this.setStateValues(msgs);
                 return result;
+            },
+            hasError() {
+                for(var i = 0, max = this.messages.length; i < max; i++) {
+                    if (this.messages[i].type === 'error') {
+                        return true;
+                    }
+                }
+                return false;
             }
         },
 
@@ -260,6 +317,14 @@
         },
 
         methods: {
+
+            messageClass(type) {
+                return {
+                    'list-group-item'       : true,
+                    'list-group-item-danger': type == 'error',
+//                    'alert-info'  : type == 'info'
+                };
+            },
             /**
              * set state messages
              *
@@ -304,6 +369,14 @@
                 this.style.values.splice(styleNr, 1);
                 this._updateResultOptionsData('style');
             },
+
+            moveStyleImage(styleNr, direction) {
+                var item = this.style.values[styleNr];
+                this.style.values[styleNr] = this.style.values[styleNr + direction];
+                this.style.values[styleNr + direction] = item;
+                this._updateResultOptionsData('style');
+            },
+
             /**
              * Adds styling image
              *
@@ -404,6 +477,28 @@
             removeResultItem(idx) {
                 this.galleryItems.splice(idx,1);
             },
+            removeAllResultItems() {
+                this.galleryItems.splice(0,this.galleryItems.length);
+            },
+            saveResultItem(idx) {
+                var download = document.createElement('a');
+                var canvas = document.createElement('canvas');
+                var image = this.galleryItems[idx];
+                canvas.width = image.width;
+                canvas.height = image.height;
+                canvas.getContext('2d').putImageData(image, 0, 0);
+                image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+                download.setAttribute("href", image);
+                download.setAttribute("download",`result_${(idx+"").padStart(5, '0')}.png`);
+                download.click();
+                
+            },
+            saveAllResultItems() {
+                for (var i = 0, max = this.galleryItems.length; i < max; i++) {
+                    this.saveResultItem(i);
+                }
+            },
+
             /**
              *
              * @param {String} type

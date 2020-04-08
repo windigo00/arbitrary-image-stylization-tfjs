@@ -15,19 +15,27 @@ import Types from '../lib/types.js';
  *
  */
 export default {
-    backend : 'cpu',
+    backend : 'default',
     backends : {
+        default: {
+            name : 'default',
+            title: '[Default] --- ',
+            hint : 'Depends on your device. most likely gpu.'
+        },
         cpu: {
             name : 'cpu',
-            title: '[Slow] CPU'
+            title: '[Slow] CPU',
+            hint : 'Very, very, very, very .... VERY SLOOooooow :)'
         },
         gpu: {
             name : 'gpu',
-            title: '[Fast] GPU'
+            title: '[Fast] GPU',
+            hint : 'see \'maximum texture resolution\' for your GPU. Big result pictures will crash the renderer.'
         },
         wasm: {
             name : 'wasm',
-            title: '[Faster] WebAssembly'
+            title: '[Faster] WebAssembly',
+            hint : 'does not work for other models than MobileNet... yet'
         }
     },
     model : {

@@ -1,63 +1,93 @@
 <template>
   <div>
-    <div class="d-flex flex-row">
+    <div class="list">
       <div
         v-for="(item, k) in items"
         :key="k"
-        class="p-0 item"
-        :style="getStyle(k)"
+        class="item"
+        @click="showDetail(k)"
       >
         <canvas
           :ref="'canvas_'+k"
-          class="d-block h-100"
+          class="h-100"
         />
+
+        <div
+          class="utils btn-group"
+          role="group"
+        >
+          <button
+            title="Save Image"
+            type="button"
+            class="btn btn-sm btn-primary"
+            @click.stop="$emit('save', k)"
+          >
+            <i class="fas fa-save" />
+          </button>
+          <button
+            title="Remove Image"
+            type="button"
+            class="btn btn-sm btn-danger"
+            @click.stop="$emit('remove', k)"
+          >
+            <i class="fas fa-times" />
+          </button>
+        </div>
+      </div>
+
+      <div
+        v-if="items.length"
+        class="utils btn-group"
+        role="group"
+      >
+        <button
+          title="Save All"
+          type="button"
+          class="btn btn-sm btn-primary"
+          @click.stop="$emit('save-all')"
+        >
+          <i class="fas fa-3x fa-file-download" />
+        </button>
+        <button
+          title="Remove Image"
+          type="button"
+          class="btn btn-sm btn-danger"
+          @click.stop="$emit('remove-all')"
+        >
+          <i class="fas fa-3x fa-trash-alt" />
+        </button>
       </div>
     </div>
     <div class="row">
       <slot />
-      <!-- span
-        style="float:left"
-        class="ss-icon"
-        @click="gallerySpin(1)"
-      >
-        &lt;
-      </span>
-      <span
-        style="float:right"
-        class="ss-icon"
-        @click="gallerySpin(-1)"
-      >
-        &gt;
-      </span -->
     </div>
+    <info-overlay
+      id="view"
+      ref="view"
+      size="lg"
+      :center="true"
+    >
+      <template #content>
+        <canvas
+          ref="view_canvas"
+          class="center h-100"
+        />
+      </template>
+    </info-overlay>
   </div>
 </template>
 <script>
+    import InfoOverlay from  './overlay.vue';
+
     export default {
+        components: {
+            InfoOverlay
+        },
         props: {
             items: { type: Array, default: null }
         },
         data() {
             return {
-                selected: 0,
-                angle: 0
-            }
-        },
-        computed: {
-            rotationStyle() {
-                return {
-//                    "-webkit-transform": `rotateY(${this.angle}deg)`,
-//                    "-moz-transform": `rotateY(${this.angle}deg)`,
-//                    transform: `rotateY(${this.angle}deg);`
-                };
-            },
-            itemAngle() {
-                return this.items.length ? 360/this.items.length : 0;
-            }
-        },
-        watched: {
-            items() {
-                this.angle = 0;
             }
         },
         mounted(){
@@ -68,6 +98,7 @@
 
         },
         methods: {
+
             updateImages() {
                 for(var i = 0, max = this.items.length; i < max; i++) {
                     var canvas = this.$refs['canvas_'+i][0];
@@ -77,14 +108,15 @@
                     canvas.getContext('2d').putImageData(image, 0, 0);
                 }
             },
-            getStyle(idx) {
-              idx;
-                return {
-//                    transform : `rotateY(${-idx*this.itemAngle}deg)`
-                };
-            },
-            gallerySpin(direction) {
-                this.angle += direction * this.itemAngle;
+
+            showDetail(k) {
+                var canvas = this.$refs['view_canvas'];
+                var image = this.items[k];
+                canvas.width = image.width;
+                canvas.height = image.height;
+                canvas.getContext('2d').putImageData(image, 0, 0);
+                this.$refs.view.dismissable = true;
+                this.$refs.view.show();
             }
         }
     }
@@ -92,58 +124,32 @@
 
 <style scoped>
 
+  .list {
+      clear: both;
+  }
   .item {
       height: 5em;
-      width: auto;
       display: inline-block;
+      margin-right: 0.2em;
+      flex: none;
+      position: relative;
+  }
+  .item canvas {
+      width: auto;
   }
 
-  /*
-  div.carousel {
-    -webkit-perspective: 1200px;
-    perspective: 1200px;
-    background: #050505ff;
-    padding-top: 2em;
-    padding-bottom: 3em;
-    font-size: 0;
-    height: 450px;
-    overflow: hidden;
+  .utils {
+      vertical-align: top;
   }
-  figure.spinner {
-    -webkit-transform-style: preserve-3d;
-    transform-style: preserve-3d;
-    height: 100%;
-    -webkit-transform-origin: 50% 50% -400px;
-    transform-origin: 50% 50% -400px;
-    -webkit-transition: 1s;
-    transition: 1s;
+  .item .utils {
+      position: absolute;
+      display: none;
+      z-index: 10;
+      top: 2px;
+      left: 2px;
   }
-  figure.spinner .item {
-    width: 100%;
-    max-width: 500px;
-    position: absolute;
-    left: 40%;
-    -webkit-transform-origin: 50% 50% -400px;
-    transform-origin: 50% 50% -400px;
-    outline: 1px solid transparent;
+  .item:hover .utils {
+      display: block;
   }
 
-  div.carousel ~ span {
-    color: #fff;
-    margin: 5%;
-    display: block;
-    text-decoration: none;
-    font-size: 2rem;
-    -webkit-transition: 0.6s color;
-    transition: 0.6s color;
-    position: relative;
-    margin-top: -13%;
-    border-bottom: none;
-    line-height: 0;
-  }
-  div.carousel ~ span:hover {
-    color: #888;
-    cursor: pointer;
-  }
-*/
 </style>

@@ -9,17 +9,12 @@
     aria-hidden="true"
   >
     <div
-      class="modal-dialog"
+      :class="modalSize"
       role="document"
     >
       <div class="modal-content">
         <div class="modal-header">
-          <h5
-            :id="id+'ModalLabel'"
-            class="modal-title"
-          >
-            {{ hasError ? 'Error' : 'Please wait' }}
-          </h5>
+          <slot name="header" />
           <button
             v-if="dismissable"
             type="button"
@@ -32,22 +27,8 @@
             </span>
           </button>
         </div>
-        <div class="modal-body">
-          <ul class="list-group">
-            <li
-              v-for="(message, k) in messages"
-              :key="k"
-              :class="messageClass(message.type)"
-            >
-              <span
-                v-if="k == (messages.length-1) && message.type != 'error'"
-                class="float-right"
-              >
-                <i class="fas fa-cog fa-spin" />
-              </span>
-              {{ message.content }}
-            </li>
-          </ul>
+        <div :class="modalContent">
+          <slot name="content" />
         </div>
       </div>
     </div>
@@ -58,8 +39,9 @@
 
     export default {
         props: {
-          id: { type: String, default: null },
-          messages: { type: Array, default: null }
+            id: { type: String, default: null },
+            size: { type: String, default: null },
+            center: { type: Boolean, default: null }
         },
         data() {
             return {
@@ -71,13 +53,18 @@
         },
 
         computed: {
-            hasError() {
-                for(var i = 0, max = this.messages.length; i < max; i++) {
-                    if (this.messages[i].type === 'error') {
-                        return true;
-                    }
-                }
-                return false;
+            modalSize() {
+                return {
+                    'modal-dialog': true,
+                    'modal-lg'    : this.size === 'lg',
+                    'modal-sm'    : this.size === 'sm',
+                };
+            },
+            modalContent() {
+                return {
+                    'modal-body'  : true,
+                    'text-center' : this.center,
+                };
             }
         },
 
@@ -99,14 +86,6 @@
         },
 
         methods: {
-
-            messageClass(type) {
-                return {
-                    'list-group-item'       : true,
-                    'list-group-item-danger': type == 'error',
-//                    'alert-info'  : type == 'info'
-                };
-            },
 
             runQueue() {
                 if (this.actionQueue.length) {

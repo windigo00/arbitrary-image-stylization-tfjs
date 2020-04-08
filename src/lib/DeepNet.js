@@ -72,8 +72,8 @@ class DeepNet {
             ratioUnit += styles[i].ratio;
         }
         let styled,
-            styleBottleneck,
-            combinedBottleneck;
+                styleBottleneck,
+                combinedBottleneck;
 
         if (this.canvas) {
             try {
@@ -82,20 +82,16 @@ class DeepNet {
 
                 combinedBottleneck = await this.tf.tidy(() => {
                     let combined,
-                        scaled;
+                            scaled;
 
-                    for(let i = 0, max = styles.length; i < max; i++) {
+                    for (let i = 0, max = styles.length; i < max; i++) {
                         postMessage(`Generating 100D style representation of image #${i}`);
-    //                    await this.tf.nextFrame();
 
                         var bottleneck = this.tf.tidy(() => {
                             return styleNet.predict(this.tf.browser.fromPixels(styles[i].resampled).toFloat().div(this.tf.scalar(255)).expandDims());
                         });
 
-        //                postMessage({ event: 'style-predict',  content: bottleneck });
-    //                    postMessage('Adding styles...');
                         var r = styles[i].ratio / ratioUnit
-        //                console.log(r);
 
                         scaled = bottleneck.mul(this.tf.scalar(r));
                         if (combined) {
@@ -124,12 +120,12 @@ class DeepNet {
 
                 postMessage('Styling image...');
 
-                    styled = await this.tf.tidy(() => {
-                        return transformerNet.predict([
-                            this.tf.browser.fromPixels(source.resampled).toFloat().div(this.tf.scalar(255)).expandDims(),
-                            styleBottleneck
-                        ]).squeeze();
-                    });
+                styled = await this.tf.tidy(() => {
+                    return transformerNet.predict([
+                        this.tf.browser.fromPixels(source.resampled).toFloat().div(this.tf.scalar(255)).expandDims(),
+                        styleBottleneck
+                    ]).squeeze();
+                });
             } catch (e) {
                 postMessage({event: 'error', message: e});
                 if (combinedBottleneck) {

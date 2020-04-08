@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h3>{{ title }}</h3>
+    <h5>{{ title }}</h5>
     <select
       :disabled="disabled"
       class="centered custom-select"
@@ -15,6 +15,9 @@
         {{ m.title }}
       </option>
     </select>
+    <small v-if="models[model].hint">
+      {{ models[model].hint }}
+    </small>
   </div>
 </template>
 <script>

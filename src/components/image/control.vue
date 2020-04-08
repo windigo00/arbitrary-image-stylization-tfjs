@@ -13,6 +13,9 @@
       >
         <i class="fas fa-times" />
       </button>
+
+      <slot name="buttons"></slot>
+      
       <button
         v-if="isLast"
         title="Add new style"
@@ -23,9 +26,9 @@
         <i class="fas fa-plus" />
       </button>
     </div>
-    <h4 class="item">
+    <h5 class="item">
       {{ title }}
-    </h4>
+    </h5>
     <div class="control item">
       <select-component
         :values="[value.source]"
