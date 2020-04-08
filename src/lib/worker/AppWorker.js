@@ -1,6 +1,4 @@
-
-
-export default class AppWorker {
+class AppWorker {
 
     constructor(worker) {
         /**
@@ -43,7 +41,9 @@ export default class AppWorker {
         that.worker.postMessage({ event: name, data: data }, transfer);
 //        })
     }
-
+    /**
+     *
+     */
     handle(event, data) {
         this[event+'Message'].apply(this, [data]);
     }
@@ -56,6 +56,11 @@ export default class AppWorker {
     //----------------------------
     //----- message handlers -----
     //----------------------------
+    /**
+     *
+     * @param {type} canvas
+     * @returns {undefined}
+     */
     initMessage(canvas) {
         if (canvas && canvas.getContext) {
             this.canvas = canvas;
@@ -65,9 +70,15 @@ export default class AppWorker {
             postMessage({event: 'error', message: "canvas not supplied"});
         }
     }
-
+    /**
+     *
+     * @param {Event} e
+     * @returns {undefined}
+     */
     errorMessage(e) {
         postMessage({event: 'error', message: `Event "${e.data.event}" not defined!`});
     }
 
 }
+
+export default AppWorker;

@@ -9,12 +9,27 @@ const imageNamesRandom = imageRandom.map(e => {
     return e.match(/\/([^\/\.]+)\.jpg/)[1].replace(/\-/g, ' ');
 })
 
-import Types from './types.js';
+import Types from '../lib/types.js';
 /**
  * App data container
  *
  */
 export default {
+    backend : 'cpu',
+    backends : {
+        cpu: {
+            name : 'cpu',
+            title: '[Slow] CPU'
+        },
+        gpu: {
+            name : 'gpu',
+            title: '[Fast] GPU'
+        },
+        wasm: {
+            name : 'wasm',
+            title: '[Faster] WebAssembly'
+        }
+    },
     model : {
         style: 'mobilenet',
         transformer: 'separable'
@@ -48,7 +63,11 @@ export default {
 
     source: {
         values: [
-            Types.ImageData
+            Types.getImageData({
+                ratio: 1.0,
+                square: false,
+                size: 200
+            })
         ],
 
         options: {

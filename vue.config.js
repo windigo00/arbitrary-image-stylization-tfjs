@@ -20,14 +20,17 @@ module.exports = {
         ]
     },
 
-//    chainWebpack: config => {
-//        // GraphQL Loader
-//        config.module
-//          .rule('wasm')
-//          .test(/\.wasm$/i)
-//          .type('javascript/auto')
-//          .use('file-loader')
-//            .loader('file-loader')
-//            .end()
-//    }
+    chainWebpack: config => {
+        // WASM Loader
+        config.module
+            .rule('wasm')
+            .test(/\.wasm$/i)
+            .type('javascript/auto')
+            .use('file-loader')
+                .loader('file-loader')
+                .options({
+                    publicPath: "/"
+                })
+                .end()
+    }
 }

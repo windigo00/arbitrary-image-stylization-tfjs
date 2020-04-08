@@ -5,25 +5,46 @@
 </template>
 
 <script>
-    import WorkerFactory from '../lib/worker_factory';
+    import WorkerFactory from '../lib/WorkerFactory';
 
     export default {
         name: 'ResultImage',
         props: {
-            options: {
+            sourceData: {
+                type: Array,
+                default: null
+            },
+            styleData: {
+                type: Array,
+                default: null
+            },
+            styleModel: {
                 type: Object,
+                default: null
+            },
+            transformerModel: {
+                type: Object,
+                default: null
+            },
+            backend: {
+                type: String,
                 default: null
             }
         },
+
         data() {
-//            console.log(this.options)
             return {
                 net: null
             };
         },
+        watch: {
+            backend() {
+                this.initWorker();
+            }
+        },
 
         created() {
-            this.offscreenWorker = WorkerFactory.getWorker('dnn', this.handleMessage, this.errorMessage);
+            this.initWorker();
         },
 
         destroyed() {
@@ -31,34 +52,37 @@
                 this.offscreenWorker.terminate();
                 this.offscreenWorker = null;
             }
-            this.imageProcessed = null;
+        },
+
+        updated() {
+            this.initWorker();
         },
 
         mounted() {
-
-//            if (!('transferControlToOffscreen' in this.$refs['out'])) {
-//                throw new Error('webgl in worker unsupported');
-//            }
-
-            if (!this.imageProcessed) {
-//                this.imageProcessed = this.$refs['out'].transferControlToOffscreen();
-                this.offscreenWorker.post('init');
-            }
-
         },
 
         methods: {
+            initWorker() {
+                if (this.offscreenWorker) {
+//                    console.log('terminate');
+                    this.offscreenWorker.terminate();
+                }
+                this.offscreenWorker = WorkerFactory.getWorker('dnn_'+this.backend, this.handleMessage, this.errorMessage);
+                this.offscreenWorker.post('init');
+            },
+
             handleMessage(e) {
                 var canvas = this.$refs['out'];
                 if (e.data == 'done') {
-                    this.offscreenWorker.terminate();
-                    this.offscreenWorker = WorkerFactory.getWorker('dnn', this.handleMessage, this.errorMessage);
-                    this.offscreenWorker.post('init');
+                    this.initWorker();
                     this.$emit('message', e.data);
                 } else if (!e.data.event) {
                     this.$emit('message', e.data);
                 } else {
                     switch (e.data.event) {
+                        case 'style-predict':
+                            console.log(e.data.content);
+                            break;
                         case 'change':
                             this.$emit('change', e.data.image);
                             canvas.width = e.data.image.width;
@@ -70,7 +94,10 @@
                             break;
 
                         case 'error':
-                            this.$emit('error', e.data);
+//                            console.log(e);
+//                            e.data.message.preventDefault();
+//                            console.log(e.message);
+                            this.$emit('error', e.data.message.message);
                         break;
                         default:
                             console.log('def');
@@ -81,11 +108,18 @@
             },
 
             errorMessage(e) {
-                this.$emit('message', e.data);
+                e.preventDefault();
+                this.$emit('error', e.message);
             },
 
             predict() {
-                this.offscreenWorker.post('style', this.options);
+                this.offscreenWorker.post('style', {
+                    sourceData:       this.sourceData,
+                    styleData:        this.styleData,
+                    styleModel:       this.styleModel,
+                    transformerModel: this.transformerModel,
+                    backend:          this.backend,
+                });
             }
         }
     }

@@ -10,7 +10,7 @@
 </template>
 
 <script>
-    import WorkerFactory from '../../lib/worker_factory';
+    import WorkerFactory from '../../lib/WorkerFactory';
 
     export default {
         name: 'ImageSampler',

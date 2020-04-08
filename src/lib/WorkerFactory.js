@@ -1,6 +1,6 @@
 
-import SamplerWorker from './worker/sampler';
-import DnnWorker from './worker/dnn';
+import SamplerWorker from './worker/SamplerWorker';
+import DnnWorker     from './worker/DnnWorker';
 
 export default class WorkerFactory {
 
@@ -8,12 +8,12 @@ export default class WorkerFactory {
         let worker;
         switch (name) {
             case 'sampler':
-                worker = new SamplerWorker(new Worker('../data/worker.js', { type: 'module' }));
+                worker = new SamplerWorker(new Worker('../workers/sampler.js', { type: 'module' }));
             break;
 
-            case 'dnn':
-                worker = new DnnWorker(new Worker('../dnn/worker.js', { type: 'module' }));
-            break;
+            case 'dnn_cpu' : worker = new DnnWorker(new Worker('../workers/dnn_backend/cpu.js',  { type: 'module' })); break;
+            case 'dnn_gpu' : worker = new DnnWorker(new Worker('../workers/dnn_backend/gpu.js',  { type: 'module' })); break;
+            case 'dnn_wasm': worker = new DnnWorker(new Worker('../workers/dnn_backend/wasm.js', { type: 'module' })); break;
 
             default:
                 new Error(`unknown worker type "${name}"!`);

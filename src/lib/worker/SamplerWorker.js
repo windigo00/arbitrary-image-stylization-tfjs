@@ -1,7 +1,7 @@
 
-import AppWorker from '../worker';
+import AppWorker from './AppWorker';
 
-export default class SamplerWorker extends AppWorker {
+class SamplerWorker extends AppWorker {
 
     renderMessage(data) {
         if (!data || (data && !data.image)) {
@@ -27,3 +27,5 @@ export default class SamplerWorker extends AppWorker {
         }
     }
 }
+
+export default SamplerWorker;

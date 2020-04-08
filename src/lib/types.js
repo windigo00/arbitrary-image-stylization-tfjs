@@ -1,6 +1,15 @@
 export default {
+    getImageData(options) {
+        if (!options) {
+            options = {};
+        }
+        return Object.assign(this.ImageData, options);
+    },
     get ImageData() {
         return new ImageData;
+    },
+    getMessageData(type, content) {
+        return new MessageData(type, content);
     },
 
     get ImageSourceData() {
@@ -15,7 +24,7 @@ class ImageData {
     constructor() {
         this.size     = 42;
         this.smooth   = false;
-        this.square   = false;
+        this.square   = true;
         this.source   = 'stored';
         this.image    = null;
         this.resampled= null;//resampled image
@@ -36,5 +45,12 @@ class ImageData {
             ret[i] = this[i];
         }
         return ret;
+    }
+}
+
+class MessageData {
+    constructor(type, content) {
+        this.type = type;
+        this.content = content;
     }
 }
