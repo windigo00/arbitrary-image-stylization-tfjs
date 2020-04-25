@@ -344,6 +344,7 @@
              * @returns {void}
              */
             changeImage(type, values, styleNr) {
+                
                 this._checkType(type);
                 styleNr = this._getTypeNumber(styleNr);
 
@@ -437,8 +438,6 @@
             },
 
             showError(src, event) {
-//                console.log('error!!!!!!!!!');
-//                console.log(src, event)
                 this.messages.push(DataTypes.getMessageData('error', event));
                 this.$refs.info.dismissable = true;
                 this.$refs.info.showError();
@@ -491,7 +490,7 @@
                 download.setAttribute("href", image);
                 download.setAttribute("download",`result_${(idx+"").padStart(5, '0')}.png`);
                 download.click();
-                
+
             },
             saveAllResultItems() {
                 for (var i = 0, max = this.galleryItems.length; i < max; i++) {
@@ -516,5 +515,16 @@
   .app-content > .row {
       padding-top: 1em;
       padding-bottom: 1em;
+  }
+
+  .jumbotron {
+      padding: 0.1rem 0rem;
+      margin-bottom: 1rem;
+  }
+
+  @media (min-width: 576px) {
+      .jumbotron {
+          padding: 0.2rem 0rem;
+      }
   }
 </style>

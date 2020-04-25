@@ -67,27 +67,32 @@
 //                    console.log('terminate');
                     this.offscreenWorker.terminate();
                 }
-                this.offscreenWorker = WorkerFactory.getWorker('dnn_'+this.backend, this.handleMessage, this.errorMessage);
+                this.offscreenWorker = WorkerFactory.getWorker('node_'+this.backend, this.handleMessage, this.errorMessage);
                 this.offscreenWorker.post('init');
             },
 
             handleMessage(e) {
+//                console.log(e);
                 var canvas = this.$refs['out'];
-                if (e.data == 'done') {
+                if (!e) {
+                  return;
+                } else if (!e.event) {
+                    this.$emit('message', e);
+                } else if (e.event == 'done') {
                     this.initWorker();
                     this.$emit('message', e.data);
-                } else if (!e.data.event) {
-                    this.$emit('message', e.data);
                 } else {
-                    switch (e.data.event) {
+                    switch (e.event) {
                         case 'style-predict':
                             console.log(e.data.content);
                             break;
                         case 'change':
-                            this.$emit('change', e.data.image);
-                            canvas.width = e.data.image.width;
-                            canvas.height = e.data.image.height;
-                            canvas.getContext('2d').putImageData(e.data.image, 0, 0);
+//                            console.log(e);
+
+                            this.$emit('change', e.image);
+                            canvas.width = e.image.width;
+                            canvas.height = e.image.height;
+                            canvas.getContext('2d').putImageData(e.image, 0, 0);
                             break;
                         case 'initialized':
                             this.$emit('init');
@@ -101,7 +106,6 @@
                         break;
                         default:
                             console.log('def');
-                            console.log(e);
                         break;
                     }
                 }
@@ -113,13 +117,16 @@
             },
 
             predict() {
-                this.offscreenWorker.post('style', {
-                    sourceData:       this.sourceData,
-                    styleData:        this.styleData,
-                    styleModel:       this.styleModel,
-                    transformerModel: this.transformerModel,
-                    backend:          this.backend,
-                });
+                this.offscreenWorker.post(
+                    'style',
+                    this.offscreenWorker.prepareData({
+                        sourceData:       this.sourceData,
+                        styleData:        this.styleData,
+                        styleModel:       this.styleModel,
+                        transformerModel: this.transformerModel,
+                        backend:          this.backend,
+                    })
+                );
             }
         }
     }

@@ -1,44 +1,62 @@
 {
-  "name": "arbitrary-image-stylization-tfjs",
-  "version": "1.0.0",
-  "author": "windigo",
-  "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
-  },
-  "dependencies": {
-    "@tensorflow/tfjs": "^1.7.1",
-    "@tensorflow/tfjs-backend-wasm": "^1.7.1",
-    "@tensorflow/tfjs-backend-webgpu": "0.0.1-alpha.0",
-    "core-js": "^3.6.4",
-    "vue": "^2.6.11"
-  },
-  "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.2.0",
-    "@vue/cli-plugin-eslint": "~4.2.0",
-    "@vue/cli-service": "~4.2.0",
-    "babel-eslint": "^10.0.3",
-    "eslint": "^6.7.2",
-    "eslint-plugin-vue": "^6.1.2",
-    "vue-template-compiler": "^2.6.11",
-    "worker-plugin": "^4.0.2"
-  },
-  "eslintConfig": {
-    "root": true,
-    "env": {
-      "node": true
-    },
-    "extends": [
-      "plugin:vue/recommended",
-      "eslint:recommended"
+    "name": "arbitrary-image-stylization-tfjs",
+    "version": "1.0.0",
+    "keywords": [
+        "util",
+        "functional",
+        "server",
+        "client",
+        "browser"
     ],
-    "parserOptions": {
-      "parser": "babel-eslint"
-    }
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions"
-  ]
+    "author": "windigo",
+    "contributors": [],
+    "scripts": {
+        "dev": "vue-cli-service serve",
+        "start": "node server/server.js",
+        "build": "vue-cli-service build",
+        "lint": "vue-cli-service lint"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/windigo00/arbitrary-image-stylization-tfjs.git"
+    },
+    "homepage": "http://windigo.wz.cz/files/ais/",
+    "license": "ISC",
+    "dependencies": {
+        "@tensorflow/tfjs": "^1.7.2",
+        "@tensorflow/tfjs-node": "^1.7.3",
+        "@tensorflow/tfjs-node-gpu": "^1.7.2",
+        "canvas": "^2.6.1",
+        "core-js": "^3.6.5",
+        "socket.io": "^2.3.0",
+        "uws": "^100.0.1",
+        "vue": "^2.6.11"
+    },
+    "devDependencies": {
+        "@vue/cli-plugin-babel": "~4.2.0",
+        "@vue/cli-plugin-eslint": "~4.2.0",
+        "@vue/cli-service": "~4.2.0",
+        "babel-eslint": "^10.0.3",
+        "eslint": "^6.7.2",
+        "eslint-plugin-vue": "^6.1.2",
+        "vue-template-compiler": "^2.6.11",
+        "worker-plugin": "^4.0.2"
+    },
+    "eslintConfig": {
+        "root": true,
+        "env": {
+            "node": true
+        },
+        "extends": [
+            "plugin:vue/recommended",
+            "eslint:recommended"
+        ],
+        "parserOptions": {
+            "parser": "babel-eslint"
+        }
+    },
+    "browserslist": [
+        "> 1%",
+        "last 2 versions"
+    ]
 }

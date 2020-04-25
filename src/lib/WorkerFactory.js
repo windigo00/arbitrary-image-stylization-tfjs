@@ -1,6 +1,7 @@
 
 import SamplerWorker from './worker/SamplerWorker';
 import DnnWorker     from './worker/DnnWorker';
+import NodeWorker     from './worker/NodeWorker';
 
 export default class WorkerFactory {
 
@@ -15,6 +16,8 @@ export default class WorkerFactory {
             case 'dnn_gpu'    : worker = new DnnWorker(new Worker('../workers/dnn_backend/gpu.js',  { type: 'module' })); break;
             case 'dnn_wasm'   : worker = new DnnWorker(new Worker('../workers/dnn_backend/wasm.js', { type: 'module' })); break;
             case 'dnn_default': worker = new DnnWorker(new Worker('../workers/dnn_backend/default.js', { type: 'module' })); break;
+
+            case 'node_default': worker = new NodeWorker('gpu'); break;
 
             default:
                 new Error(`unknown worker type "${name}"!`);

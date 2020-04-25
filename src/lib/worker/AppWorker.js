@@ -70,6 +70,14 @@ class AppWorker {
             postMessage({event: 'error', message: "canvas not supplied"});
         }
     }
+
+    getCanvas() {
+        if (!this.canvas) {
+            this.canvas = new OffscreenCanvas(0,0);
+        }
+        return this.canvas;
+    }
+
     /**
      *
      * @param {Event} e

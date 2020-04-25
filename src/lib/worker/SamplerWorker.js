@@ -20,6 +20,7 @@ class SamplerWorker extends AppWorker {
             ctx.drawImage(data.image, 0, 0, data.image.width, data.image.height, 0, 0, width, height);
 
             let rendered = ctx.getImageData(0, 0, width, height);
+//            console.log(rendered);
 
             postMessage({event: 'change', image: rendered});
         } else {

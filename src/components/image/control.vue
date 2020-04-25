@@ -14,8 +14,8 @@
         <i class="fas fa-times" />
       </button>
 
-      <slot name="buttons"></slot>
-      
+      <slot name="buttons" />
+
       <button
         v-if="isLast"
         title="Add new style"

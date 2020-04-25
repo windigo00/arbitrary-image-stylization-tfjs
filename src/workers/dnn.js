@@ -1,5 +1,6 @@
 
-import * as tf from '@tensorflow/tfjs';
+//import * as tf from '@tensorflow/tfjs';
+const tf = 'a';
 import DnnWorker from '../lib/worker/DnnWorker';
 
 var worker = null;

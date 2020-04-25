@@ -1,8 +1,8 @@
 
-import tf from '../dnn';// eslint-disable-line
+//import tf from '../dnn';// eslint-disable-line
 
 (async() => {
-    await tf.ready();
-    tf.setBackend('cpu');
-    console.log('running cpu');
+//    await tf.ready();
+//    tf.setBackend('cpu');
+//    console.log('running cpu');
 })();
